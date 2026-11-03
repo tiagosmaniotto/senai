@@ -6,14 +6,18 @@
 <title>Minha Casa Inteligente</title>
 <style>
 :root{
-  --bg:#07090d; --panel:#10141b; --panel-2:#171c26; --line:#232b38;
-  --text:#e8edf5; --muted:#8793a6; --neon:#19c3ff; --neon-soft:rgba(25,195,255,.14);
-  --ok:#2ee59d; --warn:#ffb020; --bad:#ff4d6a; --radius:22px; --side-w:340px;
+  --bg:#07090d; --panel:#10141b; --text:#e8edf5; --neon:#19c3ff; --on-accent:#021019;
+  --panel-2:color-mix(in srgb,var(--panel) 92%,var(--text)); --line:color-mix(in srgb,var(--panel) 86%,var(--text));
+  --muted:color-mix(in srgb,var(--text) 52%,var(--bg)); --neon-soft:color-mix(in srgb,var(--neon) 14%,transparent);
+  --input:color-mix(in srgb,var(--bg) 75%,var(--panel)); --btn:color-mix(in srgb,var(--panel) 88%,var(--text));
+  --track:color-mix(in srgb,var(--panel) 78%,var(--text));
+  --pad:18px; --gap:14px; --col:250px; --font:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+  --ok:#2ee59d; --warn:#ffb020; --bad:#ff4d6a; --radius:22px; --side-w:380px;
 }
 *{box-sizing:border-box;margin:0}
-html{scroll-behavior:smooth}
-body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:
-  radial-gradient(900px 500px at 85% -10%,rgba(25,195,255,.12),transparent 60%),var(--bg);
+html{scroll-behavior:smooth;font-size:var(--fs,100%)}
+body{font-family:var(--font);background:
+  radial-gradient(900px 500px at 85% -10%,color-mix(in srgb,var(--neon) 12%,transparent),transparent 60%),var(--bg);
   color:var(--text);min-height:100vh;line-height:1.4}
 .layout{display:flex;min-height:100vh}
 .content{flex:1;min-width:0;padding:clamp(14px,3vw,32px)}
@@ -32,7 +36,7 @@ body:not(.side-open) .side{margin-left:calc(var(--side-w) * -1);visibility:hidde
 .side h4:first-of-type{border-top:0;padding-top:0;margin-top:14px}
 .side label{display:block;font-size:.85rem;color:var(--muted);margin:12px 0 5px}
 .side input[type=text],.side input[type=url],.side input[type=password],.side input[type=number],.side select{
-  width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:#0b0f16;color:var(--text);font:inherit;font-size:.92rem}
+  width:100%;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--input);color:var(--text);font:inherit;font-size:.92rem}
 .side input:focus,.side select:focus{outline:2px solid var(--neon);border-color:var(--neon)}
 .inline{display:flex;gap:6px}
 .inline .btn{flex:none;padding:9px 11px}
@@ -44,9 +48,9 @@ body:not(.side-open) .side{margin-left:calc(var(--side-w) * -1);visibility:hidde
 .side .row .btn{flex:1 1 auto}
 #mqMsg{margin-top:12px;font-size:.88rem;min-height:1.2em}
 #mqMsg.bad{color:var(--bad)} #mqMsg.ok{color:var(--ok)}
-.conn{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:#0b0f16;border:1px solid var(--line);font-size:.88rem;margin-top:12px}
+.conn{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:var(--input);border:1px solid var(--line);font-size:.88rem;margin-top:12px}
 details{margin-top:18px;font-size:.82rem;color:var(--muted)}
-details pre{white-space:pre-wrap;margin-top:8px;font-size:.76rem;line-height:1.5;background:#0b0f16;padding:10px;border-radius:10px}
+details pre{white-space:pre-wrap;margin-top:8px;font-size:.76rem;line-height:1.5;background:var(--input);padding:10px;border-radius:10px}
 #scrim{display:none;position:fixed;inset:0;background:rgba(2,5,10,.7);backdrop-filter:blur(3px);z-index:25}
 .menu-btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:99px;background:var(--panel);border:1px solid var(--line);font-size:.9rem;margin-bottom:14px}
 .menu-btn:hover{border-color:var(--neon)}
@@ -56,7 +60,7 @@ header{display:flex;flex-wrap:wrap;gap:20px;justify-content:space-between;align-
 h1{font-size:clamp(1.7rem,4vw,2.6rem);font-weight:700;letter-spacing:-.02em}
 .date{color:var(--muted);margin-top:4px;text-transform:capitalize}
 .clock{font-size:clamp(2.4rem,6vw,4rem);font-weight:300;font-variant-numeric:tabular-nums;color:var(--neon);
-  text-shadow:0 0 28px rgba(25,195,255,.45);line-height:1}
+  text-shadow:0 0 28px color-mix(in srgb,var(--neon) 45%,transparent);line-height:1}
 .status-pill{display:inline-flex;align-items:center;gap:8px;margin-top:10px;padding:6px 14px;border-radius:99px;
   background:var(--panel);border:1px solid var(--line);font-size:.9rem}
 .dot{width:9px;height:9px;border-radius:50%;background:var(--ok);box-shadow:0 0 10px currentColor;color:var(--ok);flex:none}
@@ -66,11 +70,11 @@ h1{font-size:clamp(1.7rem,4vw,2.6rem);font-weight:700;letter-spacing:-.02em}
 button.status-pill:hover{border-color:var(--neon)}
 
 h2{font-size:1.1rem;font-weight:600;margin:30px 0 14px}
-.grid{display:grid;gap:14px}
+.grid{display:grid;gap:var(--gap)}
 .stats{grid-template-columns:repeat(auto-fit,minmax(170px,1fr))}
-.devices{grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.devices{grid-template-columns:repeat(auto-fit,minmax(min(var(--col),100%),1fr))}
 .card{background:linear-gradient(160deg,var(--panel-2),var(--panel));border:1px solid var(--line);
-  border-radius:var(--radius);padding:18px;box-shadow:0 10px 30px rgba(0,0,0,.35);
+  border-radius:var(--radius);padding:var(--pad);box-shadow:0 10px 30px rgba(0,0,0,.35);
   transition:border-color .3s,box-shadow .3s,background .3s}
 .stat .ico{font-size:1.4rem}
 .stat .val{font-size:1.7rem;font-weight:600;margin-top:6px;font-variant-numeric:tabular-nums}
@@ -79,28 +83,28 @@ h2{font-size:1.1rem;font-weight:600;margin:30px 0 14px}
 .dev-title{display:flex;align-items:center;gap:10px;font-weight:600}
 .dev-title span.e{font-size:1.5rem}
 .dev-state{color:var(--muted);font-size:.88rem;margin:10px 0 14px}
-.card.on{border-color:rgba(25,195,255,.55);background:linear-gradient(160deg,rgba(25,195,255,.2),var(--panel) 80%);
-  box-shadow:0 0 0 1px rgba(25,195,255,.15),0 10px 34px rgba(25,195,255,.16)}
+.card.on{border-color:color-mix(in srgb,var(--neon) 55%,transparent);background:linear-gradient(160deg,color-mix(in srgb,var(--neon) 20%,transparent),var(--panel) 80%);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--neon) 15%,transparent),0 10px 34px color-mix(in srgb,var(--neon) 16%,transparent)}
 .card.alert{border-color:rgba(255,77,106,.6);background:linear-gradient(160deg,rgba(255,77,106,.18),var(--panel) 80%)}
 .card.good{border-color:rgba(46,229,157,.5)}
 
-.switch{width:52px;height:30px;border-radius:99px;background:#2a3342;position:relative;transition:background .25s;flex:none}
+.switch{width:52px;height:30px;border-radius:99px;background:var(--track);position:relative;transition:background .25s;flex:none}
 .switch::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;
-  background:#c9d2e0;transition:transform .25s cubic-bezier(.3,1.5,.5,1),background .25s}
+  background:color-mix(in srgb,var(--text) 65%,var(--panel));transition:transform .25s cubic-bezier(.3,1.5,.5,1),background .25s}
 .switch[aria-checked="true"]{background:var(--neon)}
 .switch[aria-checked="true"]::after{transform:translateX(22px);background:#fff}
 .switch:active::after{width:28px}
 
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.btn{padding:9px 14px;border-radius:12px;background:#1f2633;border:1px solid var(--line);font-size:.9rem;
+.btn{padding:9px 14px;border-radius:12px;background:var(--btn);border:1px solid var(--line);font-size:.9rem;
   transition:transform .12s,background .2s,border-color .2s}
 .btn:hover{border-color:var(--neon)}
 .btn:active{transform:scale(.93)}
 .btn.sq{width:42px;padding:9px 0;font-size:1.1rem;text-align:center}
-.btn.primary{background:var(--neon);color:#021019;font-weight:600;border-color:var(--neon)}
+.btn.primary{background:var(--neon);color:var(--on-accent);font-weight:600;border-color:var(--neon)}
 .btn.active{background:var(--neon-soft);border-color:var(--neon);color:var(--neon)}
 .big{font-size:2rem;font-weight:300;min-width:76px;text-align:center;font-variant-numeric:tabular-nums}
-.bar{height:8px;border-radius:9px;background:#252d3b;overflow:hidden;margin-bottom:12px}
+.bar{height:8px;border-radius:9px;background:var(--track);overflow:hidden;margin-bottom:12px}
 .bar i{display:block;height:100%;background:linear-gradient(90deg,#0a7fa8,var(--neon));transition:width .4s}
 .spin{display:inline-block}
 .spin.run{animation:spin var(--dur,1s) linear infinite}
@@ -109,14 +113,14 @@ h2{font-size:1.1rem;font-weight:600;margin:30px 0 14px}
 .scenes{display:flex;gap:12px;flex-wrap:wrap}
 .scene{flex:1 1 200px;padding:16px;border-radius:var(--radius);background:var(--panel);border:1px solid var(--line);
   text-align:left;transition:transform .12s,border-color .2s,box-shadow .2s}
-.scene:hover{border-color:var(--neon);box-shadow:0 0 22px rgba(25,195,255,.18)}
+.scene:hover{border-color:var(--neon);box-shadow:0 0 22px color-mix(in srgb,var(--neon) 18%,transparent)}
 .scene:active{transform:scale(.97)}
 .scene b{display:block;font-size:1.05rem}
 .scene small{color:var(--muted)}
 .scene.danger:hover{border-color:var(--bad);box-shadow:0 0 22px rgba(255,77,106,.2)}
 
 #toasts{position:fixed;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:40;max-width:calc(100vw - 32px)}
-.toast{background:#121823;border:1px solid var(--neon);border-left-width:4px;padding:11px 16px;border-radius:14px;
+.toast{background:var(--panel);border:1px solid var(--neon);border-left-width:4px;padding:11px 16px;border-radius:14px;
   box-shadow:0 12px 30px rgba(0,0,0,.5);animation:in .3s ease;font-size:.92rem}
 .toast.out{opacity:0;transform:translateX(30px);transition:.3s}
 @keyframes in{from{opacity:0;transform:translateX(30px)}}
@@ -128,6 +132,35 @@ footer{color:var(--muted);font-size:.8rem;margin:34px 0 10px;text-align:center}
   body:not(.side-open) .side{margin-left:0;transform:translateX(-105%)}
   body.side-open #scrim{display:block}
 }
+
+[hidden]{display:none!important}
+body.noglow .card,body.noglow .card.on{box-shadow:none}
+body.noglow .clock{text-shadow:none}
+.tab{display:none}.tab.active{display:block}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:12px 0 4px;padding:4px;background:var(--input);border-radius:14px;border:1px solid var(--line)}
+.tabbtn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;border-radius:10px;font-size:.66rem;color:var(--muted)}
+.tabbtn span{font-size:1.05rem}
+.tabbtn.active{background:var(--neon-soft);color:var(--neon)}
+.side input[type=color]{width:100%;height:38px;padding:2px;border-radius:10px;border:1px solid var(--line);background:var(--input);cursor:pointer}
+.side input[type=range]{width:100%;accent-color:var(--neon)}
+.side label .v{color:var(--text);float:right}
+.colors{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.chip{display:inline-flex;align-items:center;gap:7px;padding:7px 12px;border-radius:99px;background:var(--btn);border:1px solid var(--line);font-size:.82rem}
+.chip i{width:12px;height:12px;border-radius:50%;background:var(--c);box-shadow:0 0 0 2px var(--b)}
+.chip.active{border-color:var(--neon);color:var(--neon)}
+.dev-row{display:flex;gap:6px;margin-top:8px}
+.dev-row input.ic{width:52px;text-align:center;font-size:1.1rem;flex:none}
+.dev-row.t{flex-direction:column;gap:5px;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--input)}
+.dev-row.t .dn{font-weight:600;font-size:.9rem}
+.dev-row.t input{background:var(--panel)!important}
+.pre{color:var(--muted);font-size:.85rem;align-self:center;white-space:nowrap}
+.hist{list-style:none;padding:0;margin-top:10px}
+.hist li{padding:8px 4px;border-bottom:1px solid var(--line);font-size:.82rem;word-break:break-word}
+.hist time{color:var(--muted);font-size:.72rem;margin-right:6px}
+.tag{font-size:.65rem;text-transform:uppercase;padding:1px 7px;border-radius:99px;background:var(--neon-soft);color:var(--neon);margin-right:6px}
+.hist .empty{color:var(--muted)}
+.btn.danger{border-color:var(--bad);color:var(--bad)}
 </style>
 </head>
 <body class="side-open">
@@ -140,7 +173,14 @@ footer{color:var(--muted);font-size:.8rem;margin:34px 0 10px;text-align:center}
       <button class="btn sq" id="sideClose" aria-label="Fechar barra lateral">✕</button>
     </div>
 
-    <form id="mqForm" autocomplete="on">
+    <nav class="tabs" id="tabs">
+      <button class="tabbtn active" data-tab="conn" type="button"><span>🔌</span>Conexão</button>
+      <button class="tabbtn" data-tab="topics" type="button"><span>🧭</span>Tópicos</button>
+      <button class="tabbtn" data-tab="layout" type="button"><span>🎨</span>Layout</button>
+      <button class="tabbtn" data-tab="hist" type="button"><span>🕘</span>Histórico</button>
+      <button class="tabbtn" data-tab="set" type="button"><span>🛠️</span>Ajustes</button>
+    </nav>
+    <form id="mqForm" class="tab active" data-tab="conn" autocomplete="on">
       <h4>Broker MQTT</h4>
       <label for="mqUrl">Endereço do broker (WebSocket)</label>
       <input id="mqUrl" type="url" required placeholder="wss://seu-broker:8084/mqtt" autocomplete="off" spellcheck="false">
@@ -187,23 +227,100 @@ footer{color:var(--muted);font-size:.8rem;margin:34px 0 10px;text-align:center}
       </div>
     </form>
 
-    <details><summary>Tópicos e formato das mensagens</summary><pre>&lt;prefixo&gt;/&lt;dispositivo&gt;/estado  (JSON, publicado pelo painel)
-&lt;prefixo&gt;/&lt;dispositivo&gt;/cmd     (comando: JSON parcial ou ON/OFF)
+    <section class="tab" data-tab="topics">
+      <h4>Tópicos e subtópicos</h4>
+      <div class="hint" id="topicRoot"></div>
+      <div id="topicList"></div>
+      <div class="row"><button class="btn" type="button" id="topicReset">Restaurar tópicos padrão</button></div>
+      <details><summary>Formato das mensagens</summary><pre>&lt;prefixo&gt;/&lt;subtópico&gt;/estado  (JSON, publicado pelo painel)
+&lt;prefixo&gt;/&lt;subtópico&gt;/cmd     (comando: JSON parcial ou ON/OFF)
 
-luzes/sala | cozinha | quarto | banheiro  {"on":true,"dim":false}
-ar          {"on":true,"temp":23}
-ventilador  {"on":true,"speed":2}
-porta       {"locked":true}
-cortinas    {"open":50}
-camera      {"on":true}
-alarme      {"on":true}
-tomadas/tv | cafeteira | carregador | abajur  {"on":true}
-
-&lt;prefixo&gt;/sensores       leituras a cada 3 s
-&lt;prefixo&gt;/painel/status   online / offline
+luzes  {"on":true,"dim":false}
+ar     {"on":true,"temp":23}
+ventilador {"on":true,"speed":2}
+porta  {"locked":true}
+cortinas {"open":50}
+camera / alarme / tomadas  {"on":true}
 
 Exemplo: casa/luzes/sala/cmd  →  ON</pre></details>
+    </section>
+
+    <section class="tab" data-tab="layout">
+      <h4>Tema</h4><div class="chips" id="presets"></div>
+      <h4>Cores</h4>
+      <div class="colors">
+        <label>Destaque<input type="color" data-ui="accent"></label>
+        <label>Fundo<input type="color" data-ui="bg"></label>
+        <label>Cartões<input type="color" data-ui="panel"></label>
+        <label>Texto<input type="color" data-ui="text"></label>
+      </div>
+      <h4>Forma e texto</h4>
+      <label>Arredondamento <span class="v" data-v="radius" data-u="px"></span><input type="range" min="0" max="34" data-ui="radius"></label>
+      <label>Tamanho do texto <span class="v" data-v="scale" data-u="%"></span><input type="range" min="80" max="130" step="5" data-ui="scale"></label>
+      <label>Largura mínima dos cartões <span class="v" data-v="cols" data-u="px"></span><input type="range" min="180" max="400" step="10" data-ui="cols"></label>
+      <label>Fonte<select data-ui="font"><option value="sistema">Sistema</option><option value="serifa">Serifada</option><option value="mono">Monoespaçada</option><option value="arredondada">Arredondada</option></select></label>
+      <label>Densidade<select data-ui="density"><option value="compact">Compacta</option><option value="normal">Normal</option><option value="roomy">Espaçosa</option></select></label>
+      <label class="chk"><input type="checkbox" data-ui="glow"> Brilho (sombras e neon)</label>
+      <h4>Título da página</h4>
+      <input type="text" data-ui="title" maxlength="60" aria-label="Título">
+      <h4>Seções visíveis</h4>
+      <label class="chk"><input type="checkbox" data-sec="stats"> Visão geral</label>
+      <label class="chk"><input type="checkbox" data-sec="scenes"> Cenas rápidas</label>
+      <label class="chk"><input type="checkbox" data-sec="lights"> Luzes</label>
+      <label class="chk"><input type="checkbox" data-sec="comfort"> Conforto</label>
+      <label class="chk"><input type="checkbox" data-sec="security"> Segurança</label>
+      <label class="chk"><input type="checkbox" data-sec="plugs"> Tomadas inteligentes</label>
+      <h4>Ícones e nomes</h4>
+      <div class="hint">Escolha uma sugestão ou cole qualquer emoji.</div>
+      <div id="iconList"></div>
+      <div class="row"><button class="btn" type="button" id="uiReset">Restaurar layout</button></div>
+    </section>
+
+    <section class="tab" data-tab="hist">
+      <h4>Histórico de eventos</h4>
+      <label for="histFilter">Filtro</label>
+      <select id="histFilter"><option value="all">Todos</option><option value="ação">Ações no painel</option><option value="mqtt">MQTT</option><option value="sistema">Sistema</option></select>
+      <div class="hint" id="histCount"></div>
+      <div class="row">
+        <button class="btn" type="button" id="histCsv">Exportar CSV</button>
+        <button class="btn danger" type="button" id="histClear">Limpar</button>
+      </div>
+      <ul class="hist" id="histList"></ul>
+    </section>
+
+    <section class="tab" data-tab="set">
+      <h4>Sensores</h4>
+      <label>Intervalo de atualização (s)<input type="number" min="1" max="60" data-set="sensorsEvery"></label>
+      <label class="chk"><input type="checkbox" data-set="simulate"> Simular temperatura, umidade e consumo</label>
+      <label>Unidade de temperatura<select data-set="unit"><option value="C">Celsius (°C)</option><option value="F">Fahrenheit (°F)</option></select></label>
+      <h4>Ar-condicionado</h4>
+      <div class="two"><label>Mínimo (°C)<input type="number" min="10" max="30" data-set="acMin"></label><label>Máximo (°C)<input type="number" min="10" max="35" data-set="acMax"></label></div>
+      <h4>Interface</h4>
+      <label class="chk"><input type="checkbox" data-set="clock24"> Relógio de 24 horas</label>
+      <label class="chk"><input type="checkbox" data-set="toasts"> Mostrar notificações</label>
+      <label>Duração das notificações (ms)<input type="number" min="1000" max="10000" step="100" data-set="toastMs"></label>
+      <h4>Nomes dos tópicos</h4>
+      <div class="two">
+        <label>Sufixo de estado<input type="text" data-kind="topic" data-set="sufState"></label>
+        <label>Sufixo de comando<input type="text" data-kind="topic" data-set="sufCmd"></label>
+      </div>
+      <label>Tópico dos sensores<input type="text" data-kind="topic" data-set="tSensors"></label>
+      <label>Tópico de status do painel<input type="text" data-kind="topic" data-set="tStatus"></label>
+      <div class="hint">O status do painel só muda na próxima conexão.</div>
+      <h4>Histórico</h4>
+      <label class="chk"><input type="checkbox" data-set="mqttLog"> Registrar mensagens MQTT</label>
+      <label>Máximo de eventos guardados<input type="number" min="20" max="1000" data-set="logMax"></label>
+      <h4>Dados</h4>
+      <div class="row">
+        <button class="btn" type="button" id="cfgExport">Exportar config.</button>
+        <button class="btn" type="button" id="cfgImport">Importar config.</button>
+        <input type="file" id="impFile" accept="application/json" hidden>
+      </div>
+      <div class="row" style="margin-top:8px"><button class="btn danger" type="button" id="wipeAll">Apagar todos os dados locais</button></div>
+      <div class="hint">A exportação não inclui a senha do broker.</div>
+    </section>
   </aside>
+  <datalist id="emojis"><option value="💡"><option value="🛋️"><option value="🍳"><option value="🛏️"><option value="🚿"><option value="❄️"><option value="🌀"><option value="🪟"><option value="🚪"><option value="📹"><option value="🚨"><option value="🔌"><option value="📺"><option value="☕"><option value="🔋"><option value="🪔"><option value="🔥"><option value="🌡️"><option value="💧"><option value="⚡"><option value="🏠"><option value="🔒"><option value="🔓"><option value="🔔"><option value="🎵"><option value="🎮"><option value="🖥️"><option value="🧺"><option value="🚗"><option value="🌳"><option value="🐶"><option value="🔊"><option value="🌙"><option value="☀️"><option value="🧊"><option value="🍽️"><option value="🖨️"><option value="📡"><option value="🛡️"><option value="🪴"></datalist>
   <div id="scrim"></div>
 
   <!-- ===== Conteúdo principal ===== -->
@@ -212,7 +329,7 @@ Exemplo: casa/luzes/sala/cmd  →  ON</pre></details>
     <button class="menu-btn" id="menuBtn" aria-controls="side">☰ Configurações</button>
     <header>
       <div>
-        <h1>Minha Casa Inteligente</h1>
+        <h1 id="title">Minha Casa Inteligente</h1>
         <div class="date" id="date"></div>
         <div class="pills">
           <div class="status-pill"><span class="dot" id="homeDot"></span><span id="homeStatus">Verificando…</span></div>
@@ -222,23 +339,23 @@ Exemplo: casa/luzes/sala/cmd  →  ON</pre></details>
       <div class="clock" id="clock">00:00:00</div>
     </header>
 
-    <h2>Visão geral</h2>
+    <h2 id="h-stats">Visão geral</h2>
     <section class="grid stats" id="stats"></section>
 
-    <h2>Cenas rápidas</h2>
-    <section class="scenes">
+    <h2 id="h-scenes">Cenas rápidas</h2>
+    <section class="scenes" id="scenes">
       <button class="scene" data-action="scene" data-scene="night"><b>🌙 Modo Noturno</b><small>Apaga luzes, fecha cortinas, tranca e arma o alarme</small></button>
       <button class="scene" data-action="scene" data-scene="cinema"><b>🎬 Modo Cinema</b><small>Luz suave na sala, TV ligada, extras desligados</small></button>
       <button class="scene danger" data-action="scene" data-scene="off"><b>⏻ Desligar tudo</b><small>Desativa todos os dispositivos compatíveis</small></button>
     </section>
 
-    <h2>Luzes</h2>
+    <h2 id="h-lights">Luzes</h2>
     <section class="grid devices" id="lights"></section>
-    <h2>Conforto</h2>
+    <h2 id="h-comfort">Conforto</h2>
     <section class="grid devices" id="comfort"></section>
-    <h2>Segurança</h2>
+    <h2 id="h-security">Segurança</h2>
     <section class="grid devices" id="security"></section>
-    <h2>Tomadas inteligentes</h2>
+    <h2 id="h-plugs">Tomadas inteligentes</h2>
     <section class="grid devices" id="plugs"></section>
 
     <footer>Os controles publicam e recebem mensagens via MQTT. Equipamentos físicos só reagem se estiverem inscritos nos tópicos.</footer>
@@ -295,6 +412,46 @@ function mergeDeep(base, extra) {
 function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch (e) {} }
 
 /* =========================================================
+   1B. PREFERÊNCIAS, HISTÓRICO
+   ========================================================= */
+const PREF_KEY = "smarthome.prefs.v1", HIST_KEY = "smarthome.hist.v1";
+const DEF_PREFS = {
+  ui: { preset: "neon", accent: "#19c3ff", bg: "#07090d", panel: "#10141b", text: "#e8edf5", radius: 22, scale: 100,
+        cols: 250, font: "sistema", density: "normal", glow: true, title: "Minha Casa Inteligente",
+        show: { stats: true, scenes: true, lights: true, comfort: true, security: true, plugs: true } },
+  icons: {}, names: {}, topics: {},
+  set: { sensorsEvery: 3, simulate: true, unit: "C", acMin: 16, acMax: 30, clock24: true, toasts: true, toastMs: 2600,
+         sufState: "estado", sufCmd: "cmd", tSensors: "sensores", tStatus: "painel/status", mqttLog: true, logMax: 200 }
+};
+const FONTS = { sistema: '"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif', serifa: 'Georgia,"Times New Roman",serif',
+  mono: 'ui-monospace,Consolas,Menlo,monospace', arredondada: '"Trebuchet MS","Segoe UI",system-ui,sans-serif' };
+const PRESETS = {
+  neon:  { n: "Neon azul", accent: "#19c3ff", bg: "#07090d", panel: "#10141b", text: "#e8edf5" },
+  verde: { n: "Verde",     accent: "#2ee59d", bg: "#060b09", panel: "#0f1713", text: "#e6f3ec" },
+  roxo:  { n: "Roxo",      accent: "#a78bfa", bg: "#0a0810", panel: "#15111f", text: "#eee9fb" },
+  ambar: { n: "Âmbar",     accent: "#ffb020", bg: "#0b0905", panel: "#17130b", text: "#f5eddc" },
+  rosa:  { n: "Rosa",      accent: "#ff5fa2", bg: "#0d0709", panel: "#1a1015", text: "#f7e8ee" },
+  claro: { n: "Claro",     accent: "#0a84ff", bg: "#eef2f7", panel: "#ffffff", text: "#18202c" }
+};
+function deepAssign(t, src) {
+  for (const k in src) {
+    if (src[k] && typeof src[k] === "object" && !Array.isArray(src[k])) { if (!t[k] || typeof t[k] !== "object") t[k] = {}; deepAssign(t[k], src[k]); }
+    else t[k] = src[k];
+  }
+  return t;
+}
+const prefs = deepAssign(JSON.parse(JSON.stringify(DEF_PREFS)), (() => { try { return JSON.parse(localStorage.getItem(PREF_KEY)) || {}; } catch (e) { return {}; } })());
+function savePrefs() { try { localStorage.setItem(PREF_KEY, JSON.stringify(prefs)); } catch (e) {} }
+let hist = []; try { hist = JSON.parse(localStorage.getItem(HIST_KEY)) || []; } catch (e) {}
+let tabNow = "conn", subscribed = [], sensTimer = null;
+function logEvent(k, m) {
+  hist.unshift({ t: Date.now(), k, m });
+  if (hist.length > prefs.set.logMax) hist.length = prefs.set.logMax;
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(hist)); } catch (e) {}
+  if (tabNow === "hist") renderHist();
+}
+
+/* =========================================================
    2. UTILITÁRIOS
    ========================================================= */
 const $ = id => document.getElementById(id);
@@ -302,11 +459,13 @@ const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const onOff = v => v ? "ligada" : "desligada";
 
 function toast(msg) {
+  logEvent(msg.startsWith("📡") ? "mqtt" : "ação", msg);
+  if (!prefs.set.toasts) return;
   const t = document.createElement("div");
   t.className = "toast"; t.textContent = msg;
   $("toasts").appendChild(t);
   while ($("toasts").children.length > 4) $("toasts").firstChild.remove();
-  setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 300); }, 2600);
+  setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 300); }, prefs.set.toastMs);
 }
 
 /* =========================================================
@@ -344,7 +503,7 @@ const sw = (action, key, on, label) =>
 function renderStats() {
   const sec = securityInfo();
   const items = [
-    ["🌡️", sensors.temp.toFixed(1) + " °C", "Temperatura ambiente"],
+    ["🌡️", tempStr(sensors.temp, 1), "Temperatura ambiente"],
     ["💧", Math.round(sensors.hum) + " %", "Umidade do ar"],
     ["⚡", sensors.energy.toFixed(2) + " kW", "Consumo de energia"],
     ["💡", lightsOn() + " de " + Object.keys(state.lights).length, "Luzes ligadas"],
@@ -360,7 +519,7 @@ function renderStats() {
 function renderLights() {
   $("lights").innerHTML = Object.entries(state.lights).map(([k, l]) => `
     <div class="card ${l.on ? "on" : ""}">
-      <div class="dev-head"><div class="dev-title"><span class="e">${l.emoji}</span>${l.name}</div>
+      <div class="dev-head"><div class="dev-title"><span class="e">${di("luzes/"+k,l.emoji)}</span>${nm("luzes/"+k,l.name)}</div>
         ${sw("light", k, l.on, "Luz " + l.name)}</div>
       <div class="dev-state">${l.on ? (l.dim ? "Ligada · luz suave" : "Ligada") : "Desligada"}</div>
       <div class="row"><button class="btn ${l.on && l.dim ? "active" : ""}" data-action="dim" data-key="${k}">🌗 Luz suave</button></div>
@@ -371,21 +530,21 @@ function renderComfort() {
   const { ac, fan, curtain } = state;
   $("comfort").innerHTML = `
     <div class="card ${ac.on ? "on" : ""}">
-      <div class="dev-head"><div class="dev-title"><span class="e">❄️</span>Ar-condicionado</div>${sw("ac", "", ac.on, "Ar-condicionado")}</div>
+      <div class="dev-head"><div class="dev-title"><span class="e">${di("ar","❄️")}</span>${nm("ar","Ar-condicionado")}</div>${sw("ac", "", ac.on, "Ar-condicionado")}</div>
       <div class="dev-state">${ac.on ? "Resfriando para " + ac.temp + " °C" : "Desligado"}</div>
       <div class="row">
         <button class="btn sq" data-action="acTemp" data-key="-1" aria-label="Diminuir temperatura">−</button>
-        <div class="big">${ac.temp}°C</div>
+        <div class="big">${tempStr(ac.temp, 0)}</div>
         <button class="btn sq" data-action="acTemp" data-key="1" aria-label="Aumentar temperatura">+</button>
       </div>
     </div>
     <div class="card ${fan.on ? "on" : ""}">
-      <div class="dev-head"><div class="dev-title"><span class="e spin ${fan.on ? "run" : ""}" style="--dur:${1.6 - fan.speed * 0.45}s">🌀</span>Ventilador</div>${sw("fan", "", fan.on, "Ventilador")}</div>
+      <div class="dev-head"><div class="dev-title"><span class="e spin ${fan.on ? "run" : ""}" style="--dur:${1.6 - fan.speed * 0.45}s">${di("ventilador","🌀")}</span>${nm("ventilador","Ventilador")}</div>${sw("fan", "", fan.on, "Ventilador")}</div>
       <div class="dev-state">${fan.on ? "Ligado · velocidade " + fan.speed : "Desligado"}</div>
       <div class="row">${[1, 2, 3].map(s => `<button class="btn ${fan.on && fan.speed === s ? "active" : ""}" data-action="fanSpeed" data-key="${s}">Vel. ${s}</button>`).join("")}</div>
     </div>
     <div class="card ${curtain.open > 0 ? "on" : ""}">
-      <div class="dev-head"><div class="dev-title"><span class="e">🪟</span>Cortinas</div></div>
+      <div class="dev-head"><div class="dev-title"><span class="e">${di("cortinas","🪟")}</span>${nm("cortinas","Cortinas")}</div></div>
       <div class="dev-state">${curtain.open}% abertas</div>
       <div class="bar"><i style="width:${curtain.open}%"></i></div>
       <div class="row">
@@ -401,17 +560,17 @@ function renderSecurity() {
   const { door, camera, alarm } = state;
   $("security").innerHTML = `
     <div class="card ${door.locked ? "good" : "alert"}">
-      <div class="dev-head"><div class="dev-title"><span class="e">🚪</span>Porta principal</div></div>
+      <div class="dev-head"><div class="dev-title"><span class="e">${di("porta","🚪")}</span>${nm("porta","Porta principal")}</div></div>
       <div class="dev-state">${door.locked ? "🔒 Trancada" : "🔓 Destrancada"}</div>
       <div class="row"><button class="btn primary" data-action="door">${door.locked ? "Destrancar" : "Trancar"}</button></div>
     </div>
     <div class="card ${camera.on ? "on" : ""}">
-      <div class="dev-head"><div class="dev-title"><span class="e">📹</span>Câmera de segurança</div>${sw("camera", "", camera.on, "Câmera")}</div>
+      <div class="dev-head"><div class="dev-title"><span class="e">${di("camera","📹")}</span>${nm("camera","Câmera de segurança")}</div>${sw("camera", "", camera.on, "Câmera")}</div>
       <div class="dev-state">${camera.on ? "● Monitorando · sem movimento" : "Monitoramento desativado"}</div>
       <div class="row"><button class="btn" data-action="camera">${camera.on ? "Desativar monitoramento" : "Ativar monitoramento"}</button></div>
     </div>
     <div class="card ${alarm.on ? "on" : ""}">
-      <div class="dev-head"><div class="dev-title"><span class="e">🚨</span>Alarme</div>${sw("alarm", "", alarm.on, "Alarme")}</div>
+      <div class="dev-head"><div class="dev-title"><span class="e">${di("alarme","🚨")}</span>${nm("alarme","Alarme")}</div>${sw("alarm", "", alarm.on, "Alarme")}</div>
       <div class="dev-state">${alarm.on ? "Sistema armado" : "Sistema desarmado"}</div>
       <div class="row"><button class="btn primary" data-action="alarm">${alarm.on ? "Desativar alarme" : "Ativar alarme"}</button></div>
     </div>`;
@@ -420,7 +579,7 @@ function renderSecurity() {
 function renderPlugs() {
   $("plugs").innerHTML = Object.entries(state.plugs).map(([k, p]) => `
     <div class="card ${p.on ? "on" : ""}">
-      <div class="dev-head"><div class="dev-title"><span class="e">${p.emoji}</span>${p.name}</div>${sw("plug", k, p.on, p.name)}</div>
+      <div class="dev-head"><div class="dev-title"><span class="e">${di("tomadas/"+k,p.emoji)}</span>${nm("tomadas/"+k,p.name)}</div>${sw("plug", k, p.on, p.name)}</div>
       <div class="dev-state">${p.on ? "Ligada · " + p.watts + " W" : "Desligada"}</div>
       <div class="row"><button class="btn" data-action="plug" data-key="${k}">${p.on ? "Desligar tomada" : "Ligar tomada"}</button></div>
     </div>`).join("");
@@ -444,8 +603,8 @@ const actions = {
   },
   ac() { state.ac.on = !state.ac.on; toast(`❄️ Ar-condicionado ${onOff(state.ac.on)}`); },
   acTemp(d) {
-    const n = clamp(state.ac.temp + Number(d), 16, 30);
-    if (n === state.ac.temp) return toast("❄️ Limite de temperatura atingido (16–30 °C)");
+    const n = clamp(state.ac.temp + Number(d), prefs.set.acMin, prefs.set.acMax);
+    if (n === state.ac.temp) return toast(`❄️ Limite de temperatura atingido (${prefs.set.acMin}–${prefs.set.acMax} °C)`);
     state.ac.temp = n;
     if (!state.ac.on) { state.ac.on = true; toast("❄️ Ar-condicionado ligado em " + n + " °C"); }
     else toast("❄️ Temperatura ajustada para " + n + " °C");
@@ -498,17 +657,18 @@ document.addEventListener("click", e => {
    ========================================================= */
 function tickClock() {
   const d = new Date();
-  $("clock").textContent = d.toLocaleTimeString("pt-BR");
+  $("clock").textContent = d.toLocaleTimeString("pt-BR", { hour12: !prefs.set.clock24 });
   $("date").textContent = d.toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
 }
 function tickSensors() {
+  if (!prefs.set.simulate) { sensors.energy = energyTarget(); renderStats(); return; }
   const target = state.ac.on ? state.ac.temp - 1.5 : 25.5;
   sensors.temp += (target - sensors.temp) * 0.12 + (Math.random() - .5) * 0.15;
   sensors.hum = clamp(sensors.hum + (Math.random() - .5) * 1.6 + ((state.ac.on ? 50 : 60) - sensors.hum) * 0.05, 35, 80);
   sensors.energy = Math.max(0.05, energyTarget() + (Math.random() - .5) * 0.04);
   renderStats();
   if (client && client.connected) {
-    client.publish(`${cfg.prefix}/sensores`, JSON.stringify({
+    client.publish(`${cfg.prefix}/${prefs.set.tSensors}`, JSON.stringify({
       temperatura: +sensors.temp.toFixed(1), umidade: Math.round(sensors.hum),
       consumo_kw: +sensors.energy.toFixed(2), luzes_ligadas: lightsOn(), dispositivos_ativos: activeDevices()
     }), { qos: 0 });
@@ -520,7 +680,7 @@ function tickSensors() {
    ========================================================= */
 function setSide(open) { document.body.classList.toggle("side-open", open); }
 $("menuBtn").addEventListener("click", () => setSide(!document.body.classList.contains("side-open")));
-$("mqttBtn").addEventListener("click", () => setSide(true));
+$("mqttBtn").addEventListener("click", () => { setSide(true); showTab("conn"); });
 $("sideClose").addEventListener("click", () => setSide(false));
 $("scrim").addEventListener("click", () => setSide(false));
 document.addEventListener("keydown", e => { if (e.key === "Escape" && window.innerWidth <= 900) setSide(false); });
@@ -576,18 +736,6 @@ let client = null;
 let lastPub = {};
 let synced = false;
 
-function groups() {
-  const g = [];
-  Object.keys(state.lights).forEach(k => g.push({ id: "luzes/" + k, obj: state.lights[k], schema: { on: "b", dim: "b" } }));
-  g.push({ id: "ar",         obj: state.ac,      schema: { on: "b", temp: [16, 30] } });
-  g.push({ id: "ventilador", obj: state.fan,     schema: { on: "b", speed: [1, 3] } });
-  g.push({ id: "porta",      obj: state.door,    schema: { locked: "b" } });
-  g.push({ id: "cortinas",   obj: state.curtain, schema: { open: [0, 100] } });
-  g.push({ id: "camera",     obj: state.camera,  schema: { on: "b" } });
-  g.push({ id: "alarme",     obj: state.alarm,   schema: { on: "b" } });
-  Object.keys(state.plugs).forEach(k => g.push({ id: "tomadas/" + k, obj: state.plugs[k], schema: { on: "b" } }));
-  return g;
-}
 function snapshot(g) { const o = {}; for (const k in g.schema) o[k] = g.obj[k]; return o; }
 
 function applyPartial(g, v) {
@@ -617,7 +765,9 @@ function publishChanges() {
     const j = JSON.stringify(snapshot(g));
     if (lastPub[g.id] === j) return;
     lastPub[g.id] = j;
-    client.publish(`${cfg.prefix}/${g.id}/estado`, j, { qos: cfg.qos, retain: cfg.retain });
+    const tp = topicOf(g, "state");
+    client.publish(tp, j, { qos: cfg.qos, retain: cfg.retain });
+    if (prefs.set.mqttLog) logEvent("mqtt", "📤 " + tp + " " + j);
   });
 }
 
@@ -632,7 +782,7 @@ function setMqttStatus(s, text) {
 function mqttDisconnect() {
   if (client) {
     const c = client; client = null;
-    try { c.publish(`${cfg.prefix}/painel/status`, "offline", { retain: true, qos: 0 }); } catch (e) {}
+    try { c.publish(`${statusTopic()}`, "offline", { retain: true, qos: 0 }); } catch (e) {}
     c.end(true);
   }
   lastPub = {}; synced = false; setMqttStatus("off");
@@ -650,7 +800,7 @@ function mqttConnect(user, pass) {
   const opts = {
     clientId: cfg.clientId, clean: cfg.clean, keepalive: cfg.keepalive,
     connectTimeout: 8000, reconnectPeriod: 4000,
-    will: { topic: `${cfg.prefix}/painel/status`, payload: "offline", retain: true, qos: 1 }
+    will: { topic: `${statusTopic()}`, payload: "offline", retain: true, qos: 1 }
   };
   if (user) { opts.username = user; opts.password = pass; }
 
@@ -661,8 +811,8 @@ function mqttConnect(user, pass) {
   c.on("connect", () => {
     if (c !== client) return;
     const p = cfg.prefix;
-    c.subscribe([`${p}/+/estado`, `${p}/+/+/estado`, `${p}/+/cmd`, `${p}/+/+/cmd`], { qos: cfg.qos });
-    c.publish(`${p}/painel/status`, "online", { retain: true, qos: 1 });
+    subscribed = subList(); c.subscribe(subscribed, { qos: cfg.qos });
+    c.publish(`${statusTopic()}`, "online", { retain: true, qos: 1 });
     setMqttStatus("on");
     msg(`Conectado como ${cfg.clientId}`, "ok");
     toast("📡 Conectado ao broker MQTT");
@@ -675,6 +825,7 @@ function mqttConnect(user, pass) {
   c.on("error", err => {
     if (c !== client) return;
     const m = (err && err.message) || String(err);
+    logEvent("mqtt", "Erro: " + m);
     if (/not authorized|bad user|credential|refused|identifier/i.test(m) || [4, 5].includes(err && err.code)) {
       mqttDisconnect();
       msg("Conexão recusada: confira usuário, senha e Client ID.", "bad");
@@ -684,15 +835,19 @@ function mqttConnect(user, pass) {
   });
 
   c.on("message", (topic, buf) => {
-    if (c !== client || !topic.startsWith(cfg.prefix + "/")) return;
-    const parts = topic.slice(cfg.prefix.length + 1).split("/");
-    const kind = parts.pop(), id = parts.join("/");
-    if (kind !== "estado" && kind !== "cmd") return;
-    const g = groups().find(x => x.id === id);
+    if (c !== client) return;
+    let g, kind;
+    for (const x of groups()) {
+      if (topic === topicOf(x, "cmd")) { g = x; kind = "cmd"; break; }
+      if (topic === topicOf(x, "state")) { g = x; kind = "estado"; break; }
+    }
     if (!g) return;
-    const changed = applyPartial(g, parsePayload(g, buf.toString()));
-    if (kind === "estado") lastPub[id] = JSON.stringify(snapshot(g));
-    else if (changed) toast(`📡 Comando remoto: ${id}`);
+    const txt = buf.toString();
+    if (kind === "estado" && txt === lastPub[g.id]) return; // eco da própria publicação
+    if (prefs.set.mqttLog) logEvent("mqtt", "📥 " + topic + " " + txt.slice(0, 120));
+    const changed = applyPartial(g, parsePayload(g, txt));
+    if (kind === "estado") lastPub[g.id] = JSON.stringify(snapshot(g));
+    else if (changed) toast(`📡 Comando remoto: ${g.id}`);
     if (changed) render();
   });
 }
@@ -708,13 +863,206 @@ $("mqDisc").addEventListener("click", () => { mqttDisconnect(); msg("Desconectad
 window.addEventListener("beforeunload", () => { if (client) client.end(true); });
 
 /* =========================================================
+   9B. TÓPICOS, LAYOUT, HISTÓRICO E AJUSTES
+   ========================================================= */
+const esc = t => String(t).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const di = (key, def) => prefs.icons[key] || def;
+const nm = (key, def) => prefs.names[key] || def;
+function tempStr(v, d) { return prefs.set.unit === "F" ? (v * 9 / 5 + 32).toFixed(d) + " °F" : v.toFixed(d) + " °C"; }
+function cleanPath(t) { return t.trim().replace(/[+#]/g, "").replace(/\s+/g, "_").replace(/\/{2,}/g, "/").replace(/^\/+|\/+$/g, ""); }
+
+function baseGroups() {
+  const s = prefs.set, g = [];
+  Object.keys(state.lights).forEach(k => g.push({ id: "luzes/" + k, name: state.lights[k].name, icon: state.lights[k].emoji, obj: state.lights[k], schema: { on: "b", dim: "b" } }));
+  g.push({ id: "ar",         name: "Ar-condicionado",     icon: "❄️", obj: state.ac,      schema: { on: "b", temp: [s.acMin, s.acMax] } });
+  g.push({ id: "ventilador", name: "Ventilador",          icon: "🌀", obj: state.fan,     schema: { on: "b", speed: [1, 3] } });
+  g.push({ id: "porta",      name: "Porta principal",     icon: "🚪", obj: state.door,    schema: { locked: "b" } });
+  g.push({ id: "cortinas",   name: "Cortinas",            icon: "🪟", obj: state.curtain, schema: { open: [0, 100] } });
+  g.push({ id: "camera",     name: "Câmera de segurança", icon: "📹", obj: state.camera,  schema: { on: "b" } });
+  g.push({ id: "alarme",     name: "Alarme",              icon: "🚨", obj: state.alarm,   schema: { on: "b" } });
+  Object.keys(state.plugs).forEach(k => g.push({ id: "tomadas/" + k, name: state.plugs[k].name, icon: state.plugs[k].emoji, obj: state.plugs[k], schema: { on: "b" } }));
+  return g;
+}
+// key = identificador fixo do dispositivo; id = subtópico atual (padrão ou personalizado)
+function groups() { return baseGroups().map(g => ({ ...g, key: g.id, id: prefs.topics[g.id] || g.id })); }
+function topicOf(g, kind) { return `${cfg.prefix}/${g.id}/${kind === "cmd" ? prefs.set.sufCmd : prefs.set.sufState}`; }
+function statusTopic() { return `${cfg.prefix}/${prefs.set.tStatus}`; }
+function subList() { return groups().flatMap(g => [topicOf(g, "state"), topicOf(g, "cmd")]); }
+function resubscribe() {
+  if (!client || !client.connected) return;
+  try { client.unsubscribe(subscribed); } catch (e) {}
+  subscribed = subList(); client.subscribe(subscribed, { qos: cfg.qos });
+  lastPub = {}; publishChanges();
+}
+function restartSensors() { clearInterval(sensTimer); sensTimer = setInterval(tickSensors, prefs.set.sensorsEvery * 1000); }
+
+/* ----- Abas ----- */
+function showTab(t) {
+  tabNow = t;
+  document.querySelectorAll(".side .tab").forEach(x => x.classList.toggle("active", x.dataset.tab === t));
+  document.querySelectorAll("#tabs .tabbtn").forEach(b => b.classList.toggle("active", b.dataset.tab === t));
+  if (t === "topics") renderTopics();
+  if (t === "hist") renderHist();
+}
+
+/* ----- Tópicos ----- */
+function previewOf(g) { return `estado: ${topicOf(g, "state")}  ·  cmd: ${topicOf(g, "cmd")}`; }
+function renderTopics() {
+  $("topicRoot").textContent = `Prefixo atual: ${cfg.prefix}/ (altere na aba Conexão). Cada dispositivo usa <prefixo>/<subtópico>/${prefs.set.sufState} e /${prefs.set.sufCmd}.`;
+  $("topicList").innerHTML = groups().map(g => `<div class="dev-row t">
+    <div class="dn">${esc(di(g.key, g.icon))} ${esc(nm(g.key, g.name))}</div>
+    <div class="inline"><span class="pre">${esc(cfg.prefix)}/</span><input type="text" data-tkey="${esc(g.key)}" value="${esc(g.id)}" placeholder="${esc(g.key)}" spellcheck="false" autocomplete="off"></div>
+    <div class="hint" data-prev="${esc(g.key)}">${esc(previewOf(g))}</div></div>`).join("");
+}
+$("topicList").addEventListener("input", e => {
+  const key = e.target.dataset.tkey; if (!key) return;
+  const g = groups().find(x => x.key === key), p = document.querySelector(`[data-prev="${CSS.escape(key)}"]`);
+  if (g && p) p.textContent = previewOf({ ...g, id: cleanPath(e.target.value) || key });
+});
+$("topicList").addEventListener("change", e => {
+  const key = e.target.dataset.tkey; if (!key) return;
+  let v = cleanPath(e.target.value) || key;
+  if (groups().some(g => g.key !== key && g.id === v)) { toast("⚠️ Esse subtópico já é usado por outro dispositivo"); v = prefs.topics[key] || key; }
+  if (v === key) delete prefs.topics[key]; else prefs.topics[key] = v;
+  savePrefs(); renderTopics(); resubscribe(); logEvent("sistema", `Subtópico de ${key} → ${v}`);
+});
+$("topicReset").addEventListener("click", () => { prefs.topics = {}; savePrefs(); renderTopics(); resubscribe(); toast("🧭 Tópicos restaurados"); });
+
+/* ----- Layout ----- */
+function applyUi() {
+  const u = prefs.ui, r = document.documentElement.style;
+  r.setProperty("--neon", u.accent); r.setProperty("--bg", u.bg); r.setProperty("--panel", u.panel); r.setProperty("--text", u.text);
+  r.setProperty("--radius", u.radius + "px"); r.setProperty("--fs", u.scale + "%"); r.setProperty("--col", u.cols + "px");
+  r.setProperty("--font", FONTS[u.font] || FONTS.sistema);
+  const d = { compact: [12, 10], normal: [18, 14], roomy: [24, 18] }[u.density] || [18, 14];
+  r.setProperty("--pad", d[0] + "px"); r.setProperty("--gap", d[1] + "px");
+  const n = parseInt(u.accent.slice(1), 16), c = [n >> 16 & 255, n >> 8 & 255, n & 255].map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); });
+  r.setProperty("--on-accent", (.2126 * c[0] + .7152 * c[1] + .0722 * c[2]) > .4 ? "#021019" : "#ffffff");
+  document.body.classList.toggle("noglow", !u.glow);
+  $("title").textContent = u.title; document.title = u.title;
+  const secs = { stats: ["h-stats", "stats"], scenes: ["h-scenes", "scenes"], lights: ["h-lights", "lights"], comfort: ["h-comfort", "comfort"], security: ["h-security", "security"], plugs: ["h-plugs", "plugs"] };
+  for (const k in secs) secs[k].forEach(id => $(id).hidden = u.show[k] === false);
+  document.querySelectorAll("#presets .chip").forEach(b => b.classList.toggle("active", b.dataset.p === u.preset));
+  document.querySelectorAll("[data-v]").forEach(el => el.textContent = u[el.dataset.v] + (el.dataset.u || ""));
+}
+function fillUi() {
+  document.querySelectorAll("[data-ui]").forEach(el => { const v = prefs.ui[el.dataset.ui]; if (el.type === "checkbox") el.checked = !!v; else el.value = v; });
+  document.querySelectorAll("[data-sec]").forEach(el => el.checked = prefs.ui.show[el.dataset.sec] !== false);
+}
+function buildLists() {
+  $("iconList").innerHTML = baseGroups().map(g => `<div class="dev-row">
+    <input type="text" class="ic" data-ikey="${esc(g.id)}" value="${esc(di(g.id, g.icon))}" maxlength="8" list="emojis" aria-label="Ícone de ${esc(g.name)}">
+    <input type="text" data-nkey="${esc(g.id)}" value="${esc(nm(g.id, g.name))}" maxlength="30" aria-label="Nome de ${esc(g.name)}"></div>`).join("");
+}
+function initUi() {
+  $("tabs").addEventListener("click", e => { const b = e.target.closest("[data-tab]"); if (b) showTab(b.dataset.tab); });
+  $("presets").innerHTML = Object.entries(PRESETS).map(([k, p]) => `<button type="button" class="chip" data-p="${k}" style="--c:${p.accent};--b:${p.panel}"><i></i>${p.n}</button>`).join("");
+  $("presets").addEventListener("click", e => {
+    const b = e.target.closest("[data-p]"); if (!b) return;
+    const p = PRESETS[b.dataset.p]; Object.assign(prefs.ui, { preset: b.dataset.p, accent: p.accent, bg: p.bg, panel: p.panel, text: p.text });
+    savePrefs(); fillUi(); applyUi();
+  });
+  document.querySelectorAll("[data-ui]").forEach(el => el.addEventListener("input", () => {
+    const k = el.dataset.ui;
+    prefs.ui[k] = el.type === "checkbox" ? el.checked : el.type === "range" ? Number(el.value) : el.value;
+    if (["accent", "bg", "panel", "text"].includes(k)) prefs.ui.preset = "custom";
+    savePrefs(); applyUi();
+  }));
+  document.querySelectorAll("[data-sec]").forEach(el => el.addEventListener("change", () => { prefs.ui.show[el.dataset.sec] = el.checked; savePrefs(); applyUi(); }));
+  $("iconList").addEventListener("change", e => {
+    const i = e.target, key = i.dataset.ikey || i.dataset.nkey; if (!key) return;
+    const g = baseGroups().find(x => x.id === key), map = i.dataset.ikey ? prefs.icons : prefs.names, def = i.dataset.ikey ? g.icon : g.name, v = i.value.trim();
+    if (!v || v === def) { delete map[key]; i.value = def; } else map[key] = v;
+    savePrefs(); render();
+  });
+  $("uiReset").addEventListener("click", () => {
+    prefs.ui = JSON.parse(JSON.stringify(DEF_PREFS.ui)); prefs.icons = {}; prefs.names = {};
+    savePrefs(); fillUi(); buildLists(); applyUi(); render(); toast("🎨 Layout restaurado");
+  });
+  fillUi(); buildLists(); applyUi();
+
+  /* Ajustes */
+  const fillSet = () => document.querySelectorAll("[data-set]").forEach(el => { const v = prefs.set[el.dataset.set]; if (el.type === "checkbox") el.checked = !!v; else el.value = v; });
+  fillSet();
+  document.querySelectorAll("[data-set]").forEach(el => el.addEventListener("change", () => {
+    const k = el.dataset.set, S = prefs.set; let v;
+    if (el.type === "checkbox") v = el.checked;
+    else if (el.type === "number") { v = parseFloat(el.value); if (!isFinite(v)) v = DEF_PREFS.set[k]; v = clamp(v, el.min !== "" ? +el.min : -1e9, el.max !== "" ? +el.max : 1e9); }
+    else if (el.dataset.kind === "topic") { v = cleanPath(el.value) || DEF_PREFS.set[k]; if (k === "sufState" || k === "sufCmd") v = v.replace(/\//g, "_"); }
+    else v = el.value;
+    S[k] = v;
+    if (S.sufState === S.sufCmd) { S[k] = DEF_PREFS.set[k]; toast("⚠️ Os sufixos de estado e comando precisam ser diferentes"); }
+    if (S.acMin > S.acMax) [S.acMin, S.acMax] = [S.acMax, S.acMin];
+    savePrefs(); fillSet();
+    if (k === "sufState" || k === "sufCmd") { resubscribe(); if (tabNow === "topics") renderTopics(); }
+    if (k === "sensorsEvery") restartSensors();
+    if (k === "clock24") tickClock();
+    if (k === "logMax") { hist.length = Math.min(hist.length, S.logMax); }
+    render();
+  }));
+
+  /* Histórico */
+  $("histFilter").addEventListener("change", renderHist);
+  $("histClear").addEventListener("click", () => { hist = []; try { localStorage.removeItem(HIST_KEY); } catch (e) {} renderHist(); });
+  $("histCsv").addEventListener("click", () => {
+    const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+    const csv = "data_hora,tipo,mensagem\n" + hist.map(h => [new Date(h.t).toISOString(), h.k, h.m].map(q).join(",")).join("\n");
+    download("historico-casa.csv", csv, "text/csv");
+  });
+
+  /* Dados */
+  $("cfgExport").addEventListener("click", () => download("casa-config.json", JSON.stringify({ prefs, cfg }, null, 2), "application/json"));
+  $("cfgImport").addEventListener("click", () => $("impFile").click());
+  $("impFile").addEventListener("change", e => {
+    const f = e.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const o = JSON.parse(rd.result);
+        if (o.prefs) { Object.assign(prefs, JSON.parse(JSON.stringify(DEF_PREFS))); deepAssign(prefs, o.prefs); }
+        if (o.cfg) Object.assign(cfg, o.cfg);
+        savePrefs(); persistCfg(); fillForm(); fillSet(); fillUi(); buildLists(); applyUi(); restartSensors(); render(); toast("✅ Configuração importada");
+      } catch (err) { toast("⚠️ Arquivo de configuração inválido"); }
+    };
+    rd.readAsText(f); e.target.value = "";
+  });
+  $("wipeAll").addEventListener("click", () => {
+    if (!confirm("Apagar configurações, estados e histórico salvos neste navegador?")) return;
+    [PREF_KEY, HIST_KEY, CFG_KEY, STORAGE_KEY].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
+    location.reload();
+  });
+}
+
+function renderHist() {
+  const f = $("histFilter").value, ul = $("histList");
+  const items = hist.filter(h => f === "all" || h.k === f).slice(0, 300);
+  $("histCount").textContent = `${hist.length} evento(s) guardado(s) (máx. ${prefs.set.logMax})`;
+  ul.innerHTML = "";
+  if (!items.length) { ul.innerHTML = '<li class="empty">Nenhum evento ainda.</li>'; return; }
+  const frag = document.createDocumentFragment();
+  items.forEach(h => {
+    const li = document.createElement("li"), d = new Date(h.t);
+    const tm = document.createElement("time"), tg = document.createElement("span"), tx = document.createElement("span");
+    tm.textContent = d.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }) + " " + d.toLocaleTimeString("pt-BR");
+    tg.className = "tag"; tg.textContent = h.k; tx.textContent = h.m;
+    li.append(tm, tg, tx); frag.append(li);
+  });
+  ul.append(frag);
+}
+function download(name, text, type) {
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([text], { type })); a.download = name; a.click();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* =========================================================
    10. INICIALIZAÇÃO
    ========================================================= */
 if (window.innerWidth <= 900) setSide(true); // abre a barra para pedir os dados do broker
-tickClock(); setInterval(tickClock, 1000);
+initUi(); tickClock(); setInterval(tickClock, 1000);
 sensors.energy = energyTarget();
 render();
-setInterval(tickSensors, 3000);
+restartSensors();
 setMqttStatus("off");
 </script>
 </body>
