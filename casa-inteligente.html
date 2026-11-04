@@ -137,8 +137,8 @@ footer{color:var(--muted);font-size:.8rem;margin:34px 0 10px;text-align:center}
 body.noglow .card,body.noglow .card.on{box-shadow:none}
 body.noglow .clock{text-shadow:none}
 .tab{display:none}.tab.active{display:block}
-.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:12px 0 4px;padding:4px;background:var(--input);border-radius:14px;border:1px solid var(--line)}
-.tabbtn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:7px 2px;border-radius:10px;font-size:.66rem;color:var(--muted)}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:12px 0 4px;padding:4px;background:var(--input);border-radius:14px;border:1px solid var(--line)}
+.tabbtn{display:flex;align-items:center;justify-content:center;gap:6px;padding:8px 4px;border-radius:10px;font-size:.8rem;color:var(--muted)}
 .tabbtn span{font-size:1.05rem}
 .tabbtn.active{background:var(--neon-soft);color:var(--neon)}
 .side input[type=color]{width:100%;height:38px;padding:2px;border-radius:10px;border:1px solid var(--line);background:var(--input);cursor:pointer}
@@ -161,6 +161,16 @@ body.noglow .clock{text-shadow:none}
 .tag{font-size:.65rem;text-transform:uppercase;padding:1px 7px;border-radius:99px;background:var(--neon-soft);color:var(--neon);margin-right:6px}
 .hist .empty{color:var(--muted)}
 .btn.danger{border-color:var(--bad);color:var(--bad)}
+
+.dev-row.t details{margin-top:6px}
+.dev-row.t details label{margin:8px 0 4px}
+.diag{list-style:none;padding:0;margin-top:10px}
+.diag li{padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--input);margin-bottom:8px;font-size:.86rem;word-break:break-word}
+.diag li b{display:block}
+.diag li div{color:var(--muted);margin-top:3px;font-size:.8rem;line-height:1.45}
+.diag li.ok{border-color:color-mix(in srgb,var(--ok) 55%,transparent)}
+.diag li.warn,.diag li.run{border-color:color-mix(in srgb,var(--warn) 55%,transparent)}
+.diag li.bad{border-color:color-mix(in srgb,var(--bad) 70%,transparent)}
 </style>
 </head>
 <body class="side-open">
@@ -179,12 +189,22 @@ body.noglow .clock{text-shadow:none}
       <button class="tabbtn" data-tab="layout" type="button"><span>🎨</span>Layout</button>
       <button class="tabbtn" data-tab="hist" type="button"><span>🕘</span>Histórico</button>
       <button class="tabbtn" data-tab="set" type="button"><span>🛠️</span>Ajustes</button>
+      <button class="tabbtn" data-tab="diag" type="button"><span>🩺</span>Diagnóstico</button>
     </nav>
     <form id="mqForm" class="tab active" data-tab="conn" autocomplete="on">
       <h4>Broker MQTT</h4>
-      <label for="mqUrl">Endereço do broker (WebSocket)</label>
-      <input id="mqUrl" type="url" required placeholder="wss://seu-broker:8084/mqtt" autocomplete="off" spellcheck="false">
-      <div class="hint">Use ws:// ou wss:// (navegadores não falam MQTT TCP puro).</div>
+      <label for="mqHost">Servidor (host)</label>
+      <input id="mqHost" type="text" required placeholder="broker.exemplo.com" autocomplete="off" spellcheck="false">
+      <div class="two">
+        <div><label for="mqProto">Protocolo</label>
+          <select id="mqProto"><option value="wss">wss:// (seguro)</option><option value="ws">ws:// (sem TLS)</option></select></div>
+        <div><label for="mqPort">Porta</label>
+          <input id="mqPort" type="number" min="1" max="65535" step="1" required placeholder="8084" inputmode="numeric"></div>
+      </div>
+      <label for="mqPath">Caminho (path)</label>
+      <input id="mqPath" type="text" placeholder="/mqtt" autocomplete="off" spellcheck="false">
+      <div class="hint" id="mqUrlPrev"></div>
+      <div class="hint">Navegadores usam MQTT sobre WebSocket (EMQX: 8083 ws, 8084 wss). As portas 1883/8883 são TCP e não funcionam aqui. Você pode colar uma URL completa no campo Servidor.</div>
 
       <label for="mqClientId">Client ID</label>
       <div class="inline">
@@ -220,6 +240,7 @@ body.noglow .clock{text-shadow:none}
       <div class="row">
         <button class="btn primary" type="submit" id="mqConnect">Conectar</button>
         <button class="btn" type="button" id="mqDisc" hidden>Desconectar</button>
+        <button class="btn" type="button" id="mqDiag">🩺 Diagnóstico</button>
       </div>
       <div class="row" style="margin-top:8px">
         <button class="btn" type="button" id="mqSave">💾 Salvar</button>
@@ -279,7 +300,7 @@ Exemplo: casa/luzes/sala/cmd  →  ON</pre></details>
     <section class="tab" data-tab="hist">
       <h4>Histórico de eventos</h4>
       <label for="histFilter">Filtro</label>
-      <select id="histFilter"><option value="all">Todos</option><option value="ação">Ações no painel</option><option value="mqtt">MQTT</option><option value="sistema">Sistema</option></select>
+      <select id="histFilter"><option value="all">Todos</option><option value="ação">Ações no painel</option><option value="mqtt">MQTT</option><option value="sistema">Sistema</option><option value="erro">Erros</option></select>
       <div class="hint" id="histCount"></div>
       <div class="row">
         <button class="btn" type="button" id="histCsv">Exportar CSV</button>
@@ -318,6 +339,16 @@ Exemplo: casa/luzes/sala/cmd  →  ON</pre></details>
       </div>
       <div class="row" style="margin-top:8px"><button class="btn danger" type="button" id="wipeAll">Apagar todos os dados locais</button></div>
       <div class="hint">A exportação não inclui a senha do broker.</div>
+    </section>
+
+    <section class="tab" data-tab="diag">
+      <h4>Diagnóstico de conexão</h4>
+      <div class="hint">Testa rede, endereço, WebSocket, login e permissões de assinar/publicar com os dados atuais da aba Conexão (a senha digitada é usada, mas não salva). O teste usa um Client ID temporário e não derruba a conexão principal.</div>
+      <div class="row"><button class="btn primary" type="button" id="diagRun">Executar diagnóstico</button><button class="btn" type="button" id="diagCopy">Copiar relatório</button></div>
+      <ul class="diag" id="diagRes"></ul>
+      <h4>Falhas recentes desta sessão</h4>
+      <ul class="diag" id="diagLog"></ul>
+      <div class="row"><button class="btn danger" type="button" id="diagClear">Limpar falhas</button></div>
     </section>
   </aside>
   <datalist id="emojis"><option value="💡"><option value="🛋️"><option value="🍳"><option value="🛏️"><option value="🚿"><option value="❄️"><option value="🌀"><option value="🪟"><option value="🚪"><option value="📹"><option value="🚨"><option value="🔌"><option value="📺"><option value="☕"><option value="🔋"><option value="🪔"><option value="🔥"><option value="🌡️"><option value="💧"><option value="⚡"><option value="🏠"><option value="🔒"><option value="🔓"><option value="🔔"><option value="🎵"><option value="🎮"><option value="🖥️"><option value="🧺"><option value="🚗"><option value="🌳"><option value="🐶"><option value="🔊"><option value="🌙"><option value="☀️"><option value="🧊"><option value="🍽️"><option value="🖨️"><option value="📡"><option value="🛡️"><option value="🪴"></datalist>
@@ -419,7 +450,7 @@ const DEF_PREFS = {
   ui: { preset: "neon", accent: "#19c3ff", bg: "#07090d", panel: "#10141b", text: "#e8edf5", radius: 22, scale: 100,
         cols: 250, font: "sistema", density: "normal", glow: true, title: "Minha Casa Inteligente",
         show: { stats: true, scenes: true, lights: true, comfort: true, security: true, plugs: true } },
-  icons: {}, names: {}, topics: {},
+  icons: {}, names: {}, topics: {}, topicOpts: {},
   set: { sensorsEvery: 3, simulate: true, unit: "C", acMin: 16, acMax: 30, clock24: true, toasts: true, toastMs: 2600,
          sufState: "estado", sufCmd: "cmd", tSensors: "sensores", tStatus: "painel/status", mqttLog: true, logMax: 200 }
 };
@@ -699,14 +730,14 @@ try { Object.assign(cfg, JSON.parse(localStorage.getItem(CFG_KEY)) || {}); } cat
 if (!cfg.clientId) cfg.clientId = newClientId();
 
 function fillForm() {
-  $("mqUrl").value = cfg.url; $("mqClientId").value = cfg.clientId; $("mqUser").value = cfg.user;
+  fillUrl(cfg.url); $("mqClientId").value = cfg.clientId; $("mqUser").value = cfg.user;
   $("mqPrefix").value = cfg.prefix; $("mqQos").value = String(cfg.qos); $("mqKeep").value = cfg.keepalive;
   $("mqClean").checked = cfg.clean; $("mqRetain").checked = cfg.retain;
 }
 function readForm() {
   const prefix = ($("mqPrefix").value || "").replace(/[+#]/g, "").replace(/^\/+|\/+$/g, "").trim() || "casa";
   return {
-    url: $("mqUrl").value.trim(),
+    url: buildUrl(),
     clientId: $("mqClientId").value.trim().replace(/\s+/g, "_"),
     user: $("mqUser").value.trim(),
     prefix,
@@ -751,10 +782,12 @@ function applyPartial(g, v) {
   return changed;
 }
 function parsePayload(g, txt) {
-  const t = txt.trim();
-  if (/^(on|off)$/i.test(t)) {
-    const k = Object.keys(g.schema).find(x => g.schema[x] === "b");
-    return { [k]: /^on$/i.test(t) };
+  const t = txt.trim(), bk = Object.keys(g.schema).find(x => g.schema[x] === "b");
+  if (bk) {
+    if (/^(on|1|true)$/i.test(t) || t === g.o.onTxt) return { [bk]: true };
+    if (/^(off|0|false)$/i.test(t) || t === g.o.offTxt) return { [bk]: false };
+  } else if (/^-?\d+(\.\d+)?$/.test(t)) {
+    return { [Object.keys(g.schema)[0]]: Number(t) };
   }
   try { return JSON.parse(t); } catch (e) { return null; }
 }
@@ -762,11 +795,12 @@ function parsePayload(g, txt) {
 function publishChanges() {
   if (!client || !client.connected || !synced) return;
   groups().forEach(g => {
-    const j = JSON.stringify(snapshot(g));
+    const j = encode(g);
     if (lastPub[g.id] === j) return;
     lastPub[g.id] = j;
+    if (!g.o.pub) return;
     const tp = topicOf(g, "state");
-    client.publish(tp, j, { qos: cfg.qos, retain: cfg.retain });
+    client.publish(tp, j, pubOpts(g));
     if (prefs.set.mqttLog) logEvent("mqtt", "📤 " + tp + " " + j);
   });
 }
@@ -804,14 +838,15 @@ function mqttConnect(user, pass) {
   };
   if (user) { opts.username = user; opts.password = pass; }
 
-  let c;
+  let c, linkOk = false;
   try { c = client = mqtt.connect(cfg.url, opts); }
   catch (err) { client = null; setMqttStatus("off"); return msg("Não foi possível iniciar: " + err.message, "bad"); }
 
   c.on("connect", () => {
     if (c !== client) return;
+    linkOk = true;
     const p = cfg.prefix;
-    subscribed = subList(); c.subscribe(subscribed, { qos: cfg.qos });
+    subscribed = subList(); c.subscribe(subMap());
     c.publish(`${statusTopic()}`, "online", { retain: true, qos: 1 });
     setMqttStatus("on");
     msg(`Conectado como ${cfg.clientId}`, "ok");
@@ -821,17 +856,18 @@ function mqttConnect(user, pass) {
     setTimeout(() => { if (c === client) { synced = true; publishChanges(); } }, 1500);
   });
   c.on("reconnect", () => { if (c === client) { synced = false; setMqttStatus("connecting"); } });
-  c.on("close", () => { if (c === client) { synced = false; setMqttStatus("error", "MQTT sem conexão"); } });
+  c.on("close", () => {
+    if (c !== client) return;
+    synced = false; setMqttStatus("error", "MQTT sem conexão");
+    if (!linkOk) diagAdd("Não foi possível conectar ao broker", "O servidor não respondeu ou fechou a conexão. Rode o diagnóstico para saber se o problema é rede, porta, TLS ou credenciais.", cfg.url);
+    else diagAdd("Conexão com o broker perdida", "Queda de rede, keep-alive expirado ou Client ID duplicado (outro dispositivo com o mesmo ID derruba este). O painel tenta reconectar sozinho.", "");
+  });
   c.on("error", err => {
     if (c !== client) return;
-    const m = (err && err.message) || String(err);
-    logEvent("mqtt", "Erro: " + m);
-    if (/not authorized|bad user|credential|refused|identifier/i.test(m) || [4, 5].includes(err && err.code)) {
-      mqttDisconnect();
-      msg("Conexão recusada: confira usuário, senha e Client ID.", "bad");
-    } else {
-      msg("Erro: " + m, "bad");
-    }
+    const x = explainError(err);
+    diagAdd(x.title, x.hint, String((err && err.message) || err || ""));
+    if (x.fatal) { mqttDisconnect(); setMqttStatus("error", x.title); }
+    msg(x.title + " — veja a aba Diagnóstico.", "bad");
   });
 
   c.on("message", (topic, buf) => {
@@ -846,7 +882,7 @@ function mqttConnect(user, pass) {
     if (kind === "estado" && txt === lastPub[g.id]) return; // eco da própria publicação
     if (prefs.set.mqttLog) logEvent("mqtt", "📥 " + topic + " " + txt.slice(0, 120));
     const changed = applyPartial(g, parsePayload(g, txt));
-    if (kind === "estado") lastPub[g.id] = JSON.stringify(snapshot(g));
+    if (kind === "estado") lastPub[g.id] = encode(g);
     else if (changed) toast(`📡 Comando remoto: ${g.id}`);
     if (changed) render();
   });
@@ -884,14 +920,28 @@ function baseGroups() {
   return g;
 }
 // key = identificador fixo do dispositivo; id = subtópico atual (padrão ou personalizado)
-function groups() { return baseGroups().map(g => ({ ...g, key: g.id, id: prefs.topics[g.id] || g.id })); }
-function topicOf(g, kind) { return `${cfg.prefix}/${g.id}/${kind === "cmd" ? prefs.set.sufCmd : prefs.set.sufState}`; }
+const DEF_OPT = { pub: true, sub: true, abs: false, qos: "", retain: "", fmt: "json", onTxt: "ON", offTxt: "OFF" };
+const devOpts = key => Object.assign({}, DEF_OPT, prefs.topicOpts[key]);
+function groups() { return baseGroups().map(g => ({ ...g, key: g.id, id: prefs.topics[g.id] || g.id, o: devOpts(g.id) })); }
+function topicOf(g, kind) { return `${g.o.abs ? "" : cfg.prefix + "/"}${g.id}/${kind === "cmd" ? prefs.set.sufCmd : prefs.set.sufState}`; }
 function statusTopic() { return `${cfg.prefix}/${prefs.set.tStatus}`; }
-function subList() { return groups().flatMap(g => [topicOf(g, "state"), topicOf(g, "cmd")]); }
+const qosOf = g => g.o.qos === "" ? cfg.qos : Number(g.o.qos);
+const pubOpts = g => ({ qos: qosOf(g), retain: g.o.retain === "" ? cfg.retain : g.o.retain === "1" });
+function subMap() {
+  const m = {};
+  groups().forEach(g => { m[topicOf(g, "state")] = { qos: qosOf(g) }; if (g.o.sub) m[topicOf(g, "cmd")] = { qos: qosOf(g) }; });
+  return m;
+}
+function subList() { return Object.keys(subMap()); }
+function encode(g) {
+  if (g.o.fmt !== "texto") return JSON.stringify(snapshot(g));
+  const bk = Object.keys(g.schema).find(x => g.schema[x] === "b");
+  return bk ? (g.obj[bk] ? g.o.onTxt : g.o.offTxt) : String(g.obj[Object.keys(g.schema)[0]]);
+}
 function resubscribe() {
   if (!client || !client.connected) return;
   try { client.unsubscribe(subscribed); } catch (e) {}
-  subscribed = subList(); client.subscribe(subscribed, { qos: cfg.qos });
+  subscribed = subList(); client.subscribe(subMap());
   lastPub = {}; publishChanges();
 }
 function restartSensors() { clearInterval(sensTimer); sensTimer = setInterval(tickSensors, prefs.set.sensorsEvery * 1000); }
@@ -903,30 +953,104 @@ function showTab(t) {
   document.querySelectorAll("#tabs .tabbtn").forEach(b => b.classList.toggle("active", b.dataset.tab === t));
   if (t === "topics") renderTopics();
   if (t === "hist") renderHist();
+  if (t === "diag") renderDiagLog();
 }
 
 /* ----- Tópicos ----- */
+const openKeys = new Set();
 function previewOf(g) { return `estado: ${topicOf(g, "state")}  ·  cmd: ${topicOf(g, "cmd")}`; }
+function refreshPrev() {
+  groups().forEach(g => { const p = document.querySelector(`[data-prev="${CSS.escape(g.key)}"]`); if (p) p.textContent = previewOf(g); });
+}
 function renderTopics() {
   $("topicRoot").textContent = `Prefixo atual: ${cfg.prefix}/ (altere na aba Conexão). Cada dispositivo usa <prefixo>/<subtópico>/${prefs.set.sufState} e /${prefs.set.sufCmd}.`;
+  const sel = (g, f, opts) => `<select data-okey="${esc(g.key)}" data-of="${f}">${opts.map(([v, t]) => `<option value="${v}" ${String(g.o[f]) === v ? "selected" : ""}>${t}</option>`).join("")}</select>`;
+  const chk = (g, f, t) => `<label class="chk"><input type="checkbox" data-okey="${esc(g.key)}" data-of="${f}" ${g.o[f] ? "checked" : ""}> ${t}</label>`;
   $("topicList").innerHTML = groups().map(g => `<div class="dev-row t">
     <div class="dn">${esc(di(g.key, g.icon))} ${esc(nm(g.key, g.name))}</div>
-    <div class="inline"><span class="pre">${esc(cfg.prefix)}/</span><input type="text" data-tkey="${esc(g.key)}" value="${esc(g.id)}" placeholder="${esc(g.key)}" spellcheck="false" autocomplete="off"></div>
-    <div class="hint" data-prev="${esc(g.key)}">${esc(previewOf(g))}</div></div>`).join("");
+    <div class="inline"><span class="pre">${g.o.abs ? "" : esc(cfg.prefix) + "/"}</span><input type="text" data-tkey="${esc(g.key)}" value="${esc(g.id)}" placeholder="${esc(g.key)}" spellcheck="false" autocomplete="off"></div>
+    <div class="hint" data-prev="${esc(g.key)}">${esc(previewOf(g))}</div>
+    <details class="more" data-dk="${esc(g.key)}" ${openKeys.has(g.key) ? "open" : ""}><summary>Opções MQTT</summary>
+      ${chk(g, "pub", "Publicar o estado deste botão")}
+      ${chk(g, "sub", "Aceitar comandos (inscrever em cmd)")}
+      ${chk(g, "abs", "Tópico absoluto (ignorar o prefixo)")}
+      <div class="two">
+        <div><label>QoS</label>${sel(g, "qos", [["", "Padrão"], ["0", "0"], ["1", "1"], ["2", "2"]])}</div>
+        <div><label>Retain</label>${sel(g, "retain", [["", "Padrão"], ["1", "Sim"], ["0", "Não"]])}</div>
+      </div>
+      <label>Formato do payload</label>${sel(g, "fmt", [["json", "JSON"], ["texto", "Texto simples"]])}
+      <div class="two">
+        <div><label>Texto “ligado”</label><input type="text" data-okey="${esc(g.key)}" data-of="onTxt" value="${esc(g.o.onTxt)}" maxlength="20"></div>
+        <div><label>Texto “desligado”</label><input type="text" data-okey="${esc(g.key)}" data-of="offTxt" value="${esc(g.o.offTxt)}" maxlength="20"></div>
+      </div>
+      <div class="hint">Texto simples publica só o valor principal (ON/OFF ou número). Ao receber, ON/OFF/1/0 e seus textos são aceitos.</div>
+      <div class="row"><button class="btn" type="button" data-pubnow="${esc(g.key)}">📤 Publicar agora</button></div>
+    </details></div>`).join("");
 }
+$("topicList").addEventListener("toggle", e => { const k = e.target.dataset && e.target.dataset.dk; if (k) { if (e.target.open) openKeys.add(k); else openKeys.delete(k); } }, true);
 $("topicList").addEventListener("input", e => {
   const key = e.target.dataset.tkey; if (!key) return;
   const g = groups().find(x => x.key === key), p = document.querySelector(`[data-prev="${CSS.escape(key)}"]`);
   if (g && p) p.textContent = previewOf({ ...g, id: cleanPath(e.target.value) || key });
 });
 $("topicList").addEventListener("change", e => {
-  const key = e.target.dataset.tkey; if (!key) return;
-  let v = cleanPath(e.target.value) || key;
+  const el = e.target, f = el.dataset.of;
+  if (f) {
+    const key = el.dataset.okey, o = prefs.topicOpts[key] || (prefs.topicOpts[key] = {});
+    let v = el.type === "checkbox" ? el.checked : el.value.trim();
+    if (f === "onTxt" || f === "offTxt") {
+      const other = devOpts(key)[f === "onTxt" ? "offTxt" : "onTxt"];
+      if (!v || v === other) { toast("⚠️ Os textos ligado/desligado precisam ser diferentes e não vazios"); v = DEF_OPT[f]; }
+      el.value = v;
+    }
+    if (v === DEF_OPT[f]) delete o[f]; else o[f] = v;
+    if (!Object.keys(o).length) delete prefs.topicOpts[key];
+    savePrefs();
+    if (f === "abs") renderTopics(); else refreshPrev();
+    resubscribe(); logEvent("sistema", `Opção ${f} de ${key} → ${v === "" ? "padrão" : v}`);
+    return;
+  }
+  const key = el.dataset.tkey; if (!key) return;
+  let v = cleanPath(el.value) || key;
   if (groups().some(g => g.key !== key && g.id === v)) { toast("⚠️ Esse subtópico já é usado por outro dispositivo"); v = prefs.topics[key] || key; }
   if (v === key) delete prefs.topics[key]; else prefs.topics[key] = v;
   savePrefs(); renderTopics(); resubscribe(); logEvent("sistema", `Subtópico de ${key} → ${v}`);
 });
-$("topicReset").addEventListener("click", () => { prefs.topics = {}; savePrefs(); renderTopics(); resubscribe(); toast("🧭 Tópicos restaurados"); });
+$("topicList").addEventListener("click", e => {
+  const b = e.target.closest("[data-pubnow]"); if (!b) return;
+  const g = groups().find(x => x.key === b.dataset.pubnow);
+  if (!client || !client.connected) return toast("⚠️ Conecte ao broker antes de publicar");
+  const tp = topicOf(g, "state"), j = encode(g);
+  client.publish(tp, j, pubOpts(g)); lastPub[g.id] = j;
+  toast("📤 Publicado em " + tp); if (prefs.set.mqttLog) logEvent("mqtt", "📤 " + tp + " " + j);
+});
+$("topicReset").addEventListener("click", () => { prefs.topics = {}; prefs.topicOpts = {}; savePrefs(); renderTopics(); resubscribe(); toast("🧭 Tópicos e opções restaurados"); });
+
+/* ----- Conexão: servidor, porta e caminho ----- */
+function buildUrl() {
+  const h = $("mqHost").value.trim(), p = $("mqPort").value.trim(); let path = $("mqPath").value.trim();
+  if (path && path[0] !== "/") path = "/" + path;
+  return `${$("mqProto").value}://${h}${p ? ":" + p : ""}${path}`;
+}
+function updPrev() { $("mqUrlPrev").textContent = "URL final: " + buildUrl(); }
+function fillUrl(u) {
+  try {
+    const x = new URL(u), pr = x.protocol.replace(":", "");
+    if (pr !== "ws" && pr !== "wss") throw 0;
+    $("mqProto").value = pr; $("mqHost").value = x.hostname; $("mqPort").value = x.port || (pr === "wss" ? "443" : "80"); $("mqPath").value = x.pathname + x.search;
+  } catch (e) { $("mqHost").value = u || ""; }
+  updPrev();
+}
+function bindConn() {
+  ["mqHost", "mqPort", "mqPath"].forEach(id => $(id).addEventListener("input", updPrev));
+  $("mqHost").addEventListener("change", () => { if (/^wss?:\/\//i.test($("mqHost").value.trim())) fillUrl($("mqHost").value.trim()); });
+  $("mqProto").addEventListener("change", () => {
+    const p = $("mqPort"), pr = $("mqProto").value;
+    if (["", "80", "443", "8083", "8084"].includes(p.value)) p.value = pr === "wss" ? "8084" : "8083";
+    updPrev();
+  });
+  $("mqDiag").addEventListener("click", () => { showTab("diag"); runDiag(); });
+}
 
 /* ----- Layout ----- */
 function applyUi() {
@@ -979,7 +1103,7 @@ function initUi() {
     prefs.ui = JSON.parse(JSON.stringify(DEF_PREFS.ui)); prefs.icons = {}; prefs.names = {};
     savePrefs(); fillUi(); buildLists(); applyUi(); render(); toast("🎨 Layout restaurado");
   });
-  fillUi(); buildLists(); applyUi();
+  fillUi(); buildLists(); applyUi(); bindConn(); bindDiag();
 
   /* Ajustes */
   const fillSet = () => document.querySelectorAll("[data-set]").forEach(el => { const v = prefs.set[el.dataset.set]; if (el.type === "checkbox") el.checked = !!v; else el.value = v; });
@@ -1030,6 +1154,145 @@ function initUi() {
     if (!confirm("Apagar configurações, estados e histórico salvos neste navegador?")) return;
     [PREF_KEY, HIST_KEY, CFG_KEY, STORAGE_KEY].forEach(k => { try { localStorage.removeItem(k); } catch (e) {} });
     location.reload();
+  });
+}
+
+/* ----- Diagnóstico ----- */
+const diagLog = [];
+let diagBusy = false, diagReport = "";
+function explainError(err) {
+  const m = String((err && err.message) || err || ""), code = err && err.code;
+  const t = (title, hint, fatal) => ({ title, hint, fatal: !!fatal });
+  if (code === 4 || /bad user|bad password/i.test(m)) return t("Usuário ou senha incorretos", "O broker recusou as credenciais. Confira usuário e senha (maiúsculas, espaços) e se o usuário existe no broker (no EMQX Cloud: Access Control › Authentication).", true);
+  if (code === 5 || /not authorized/i.test(m)) return t("Não autorizado pelo broker", "As credenciais estão ausentes ou sem permissão. Verifique usuário/senha e as regras de autorização (ACL) do broker.", true);
+  if (code === 2 || /identifier/i.test(m)) return t("Client ID recusado", "O ID é inválido ou já está em uso. Gere outro com o botão 🎲: cada dispositivo precisa de um ID único.", true);
+  if (code === 1 || /unacceptable protocol/i.test(m)) return t("Versão do protocolo MQTT recusada", "O broker não aceita a versão usada pelo painel (MQTT 3.1.1). Verifique a configuração do broker.", true);
+  if (code === 3 || /server unavailable/i.test(m)) return t("Servidor MQTT indisponível", "O broker está fora do ar ou sobrecarregado. Tente novamente em instantes.");
+  if (/connack timeout/i.test(m)) return t("Broker não respondeu ao CONNECT", "A porta abriu, mas o servidor não falou MQTT. Confira porta e caminho (ex.: 8084 wss, 8083 ws, caminho /mqtt) e se não está usando uma porta TCP (1883/8883).");
+  if (/keepalive/i.test(m)) return t("Keep-alive expirou", "O broker parou de responder. Verifique a rede ou aumente o keep-alive na aba Conexão.");
+  if (/timeout|timed out/i.test(m)) return t("Tempo de conexão esgotado", "O servidor não respondeu a tempo. Confira host, porta e firewall.");
+  return t("Falha ao conectar ao broker", "Causas comuns: host ou porta incorretos, broker offline, certificado TLS inválido ou autoassinado, firewall/proxy bloqueando WebSocket, caminho errado (/mqtt) ou página em HTTPS usando ws://. O navegador não informa o motivo exato; rode o diagnóstico." + (m && m !== "[object Event]" ? " Detalhe: " + m : ""));
+}
+function diagAdd(title, hint, raw) {
+  const l = diagLog[0];
+  if (l && l.title === title && Date.now() - l.t < 120000) { l.n++; l.t = Date.now(); if (l.n === 3) toast("🩺 Falhas repetidas na conexão: veja a aba Diagnóstico"); }
+  else { diagLog.unshift({ t: Date.now(), title, hint, raw: raw || "", n: 1 }); if (diagLog.length > 50) diagLog.length = 50; logEvent("erro", title + (raw ? " — " + raw : "")); }
+  if (tabNow === "diag") renderDiagLog();
+}
+function liDiag(cls, title, detail) {
+  const li = document.createElement("li"); li.className = cls;
+  const b = document.createElement("b"); b.textContent = title; li.append(b);
+  if (detail) { const d = document.createElement("div"); d.textContent = detail; li.append(d); }
+  return li;
+}
+function renderDiagLog() {
+  const ul = $("diagLog"); ul.innerHTML = "";
+  if (!diagLog.length) { ul.append(liDiag("ok", "Nenhuma falha registrada nesta sessão", "")); return; }
+  diagLog.forEach(e => ul.append(liDiag("bad", `❌ ${e.title}${e.n > 1 ? " (×" + e.n + ")" : ""}`, `${new Date(e.t).toLocaleTimeString("pt-BR")} · ${e.hint}${e.raw ? " · Detalhe: " + e.raw : ""}`)));
+}
+function wsProbe(url, ms = 7000) {
+  return new Promise(res => {
+    const t0 = performance.now(); let done = false, w;
+    const fin = (ok, info) => { if (done) return; done = true; clearTimeout(tm); try { w && w.close(); } catch (e) {} res({ ok, ms: Math.round(performance.now() - t0), ...info }); };
+    const tm = setTimeout(() => fin(false, { why: "timeout" }), ms);
+    try { w = new WebSocket(url, "mqtt"); } catch (e) { return fin(false, { why: "exception", msg: e.message }); }
+    w.onopen = () => fin(true, {}); w.onerror = () => fin(false, { why: "error" }); w.onclose = ev => fin(false, { why: "close", code: ev.code });
+  });
+}
+function mqttProbe(f, pass) {
+  return new Promise(res => {
+    const t0 = performance.now(); let c, fin = false, connected = false, t2 = null;
+    const done = o => { if (fin) return; fin = true; clearTimeout(tm); clearTimeout(t2); try { c.end(true); } catch (e) {} res({ ms: Math.round(performance.now() - t0), ...o }); };
+    const tm = setTimeout(() => done({ stage: "timeout" }), 10000);
+    const rnd = Math.random().toString(16).slice(2, 8), topic = `${f.prefix}/diag/${rnd}`;
+    try {
+      c = mqtt.connect(f.url, { clientId: (f.clientId || "smarthome").slice(0, 40) + "_diag" + rnd.slice(0, 3), username: f.user || undefined, password: f.user ? pass : undefined, clean: true, reconnectPeriod: 0, connectTimeout: 8000 });
+    } catch (e) { return done({ stage: "error", err: e }); }
+    c.on("error", err => done({ stage: "error", err }));
+    c.on("close", () => { if (!connected) done({ stage: "close" }); });
+    c.on("message", tp => { if (tp === topic) done({ stage: "ok" }); });
+    c.on("connect", () => {
+      connected = true;
+      c.subscribe(topic, { qos: 0 }, (err, granted) => {
+        if (err || !granted || !granted.length || granted[0].qos === 128) return done({ stage: "sub", err });
+        clearTimeout(tm); t2 = setTimeout(() => done({ stage: "noecho" }), 4000);
+        c.publish(topic, "ping", { qos: 0 }, e2 => { if (e2) done({ stage: "pub", err: e2 }); });
+      });
+    });
+  });
+}
+async function runDiag() {
+  if (diagBusy) return; diagBusy = true; $("diagRun").disabled = true;
+  const out = [], ico = { ok: "✅", warn: "⚠️", bad: "❌", run: "⏳" };
+  const paint = () => { const ul = $("diagRes"); ul.innerHTML = ""; out.forEach(o => ul.append(liDiag(o.lv, ico[o.lv] + " " + o.t, o.d))); };
+  const add = (lv, t, d) => { out.push({ lv, t, d }); paint(); return out.length - 1; };
+  const set = (i, lv, t, d) => { out[i] = { lv, t, d }; paint(); };
+  try {
+    const f = readForm(), pass = $("mqPass").value;
+    const host = $("mqHost").value.trim(), port = Number($("mqPort").value), path = $("mqPath").value.trim(), proto = $("mqProto").value;
+    if (typeof mqtt === "undefined") add("bad", "Biblioteca MQTT não carregou", "O script do CDN (jsdelivr) foi bloqueado ou está sem internet. Verifique bloqueadores/firewall, ou baixe mqtt.min.js e hospede junto da página.");
+    else add("ok", "Biblioteca MQTT carregada", "");
+    add(navigator.onLine ? "ok" : "bad", navigator.onLine ? "Navegador online" : "Navegador sem internet", navigator.onLine ? "" : "O navegador informa que está offline. Verifique Wi-Fi/cabo.");
+
+    const pr = [];
+    if (!host) pr.push("O servidor está vazio.");
+    else if (/[\s\/:@]/.test(host)) pr.push("O campo Servidor deve ter só o nome (ex.: broker.exemplo.com), sem protocolo, porta ou caminho.");
+    if (!(port >= 1 && port <= 65535)) pr.push("Porta inválida (use 1 a 65535).");
+    if (port === 1883 || port === 8883) pr.push(`A porta ${port} é MQTT sobre TCP; o navegador só usa WebSocket (ex.: 8083/8084, 443, 8080, 9001).`);
+    if (proto === "wss" && port === 8083) pr.push("8083 costuma ser WebSocket SEM TLS (ws://). Para wss:// use 8084.");
+    if (proto === "ws" && port === 8084) pr.push("8084 costuma ser WebSocket COM TLS (wss://).");
+    if (location.protocol === "https:" && proto === "ws") pr.push("A página está em HTTPS e o navegador bloqueia ws://. Use wss://.");
+    add(pr.length ? "bad" : "ok", pr.length ? "Endereço do broker com problemas" : "Endereço do broker válido", pr.length ? pr.join(" ") : f.url);
+    if (!path || path === "/") add("warn", "Caminho vazio", "A maioria dos brokers usa /mqtt (EMQX, Mosquitto). Se a conexão falhar, tente /mqtt.");
+
+    if (!f.clientId) add("bad", "Client ID vazio", "Informe um ID único ou gere um com 🎲.");
+    else if (f.clientId.length > 64) add("warn", "Client ID muito longo", "Alguns brokers recusam IDs com mais de 64 caracteres.");
+    else add("ok", "Client ID válido", f.clientId + " (deve ser único entre os dispositivos).");
+
+    if (!f.user) add("warn", "Sem usuário", "Brokers como o EMQX Cloud exigem autenticação. Se a conexão for recusada, informe usuário e senha.");
+    else if (!pass) add("warn", "Senha em branco", "A senha não é salva no navegador: digite-a novamente antes de conectar.");
+    else add("ok", "Usuário e senha preenchidos", "");
+
+    const gs = groups(), ids = gs.map(g => topicOf(g, "state")), dup = ids.filter((x, i) => ids.indexOf(x) !== i);
+    if (/[+#]/.test(f.prefix) || dup.length) add("bad", "Tópicos com problema", dup.length ? "Tópicos duplicados: " + [...new Set(dup)].join(", ") : "O prefixo não pode conter + ou #.");
+    else add("ok", "Tópicos válidos", `${gs.length} dispositivos · ${subList().length} assinaturas`);
+
+    const cur = client && client.connected ? ["ok", `Conectado como ${cfg.clientId}`] : client ? ["warn", "Tentando conectar ou reconectando…"] : ["warn", "Desconectado (use Conectar na aba Conexão)."];
+    add(cur[0], "Conexão principal", cur[1]);
+
+    const hard = pr.length || !host;
+    if (hard) add("warn", "Testes de rede ignorados", "Corrija o endereço acima para testar o servidor.");
+    else {
+      const i = add("run", "Teste de WebSocket", `Abrindo ${f.url} …`);
+      const w = await wsProbe(f.url);
+      if (w.ok) set(i, "ok", "Servidor WebSocket acessível", `Resposta em ${w.ms} ms: rede, porta e TLS estão funcionando.`);
+      else if (w.why === "timeout") set(i, "bad", "Sem resposta do servidor (tempo esgotado)", "Host ou porta inacessível, broker offline ou firewall/proxy bloqueando. Confira o endereço e a porta, e teste em outra rede.");
+      else set(i, "bad", "Não foi possível abrir o WebSocket" + (w.code ? ` (código ${w.code})` : ""), "O navegador não revela o motivo exato. Causas comuns: certificado TLS inválido/expirado, porta errada, caminho incorreto (/mqtt), broker sem WebSocket habilitado, ou bloqueio de rede.");
+      if (w.ok && typeof mqtt !== "undefined") {
+        const j = add("run", "Teste MQTT", "Autenticando, assinando e publicando um tópico de teste…");
+        const r = await mqttProbe(f, pass);
+        if (r.stage === "ok") set(j, "ok", "Login, assinatura e publicação funcionam", `Ciclo completo em ${r.ms} ms.`);
+        else if (r.stage === "error") { const x = explainError(r.err); set(j, "bad", x.title, x.hint); }
+        else if (r.stage === "close") set(j, "bad", "O broker fechou a conexão antes de aceitar o login", "Confira usuário, senha, Client ID e as regras de acesso do broker.");
+        else if (r.stage === "timeout") set(j, "bad", "O broker não respondeu ao CONNECT (10 s)", "O WebSocket abre, mas o servidor não fala MQTT nessa porta/caminho. Revise a porta e o caminho.");
+        else if (r.stage === "sub") set(j, "bad", "Assinatura recusada pelo broker", `O usuário não tem permissão de subscribe em "${f.prefix}/#". Ajuste as regras de ACL.`);
+        else if (r.stage === "pub") set(j, "bad", "Publicação recusada pelo broker", "Erro ao publicar: " + ((r.err && r.err.message) || ""));
+        else set(j, "warn", "Conectou e assinou, mas a publicação não voltou", `Provável falta de permissão de publish em "${f.prefix}/…" (ACL) ou broker limitando os tópicos.`);
+      }
+    }
+    const bad = out.filter(o => o.lv === "bad").length, warn = out.filter(o => o.lv === "warn").length;
+    add(bad ? "bad" : warn ? "warn" : "ok", bad ? `Resumo: ${bad} problema(s) encontrado(s)` : warn ? "Resumo: nenhuma falha, mas há avisos" : "Resumo: tudo certo", "");
+  } catch (e) { add("bad", "Erro inesperado no diagnóstico", String(e && e.message || e)); }
+  diagReport = "Diagnóstico " + new Date().toLocaleString("pt-BR") + "\n" + out.map(o => `${ico[o.lv]} ${o.t}${o.d ? " — " + o.d : ""}`).join("\n") +
+    (diagLog.length ? "\n\nFalhas recentes:\n" + diagLog.map(e => `- ${e.title} (×${e.n}): ${e.raw}`).join("\n") : "");
+  diagBusy = false; $("diagRun").disabled = false; renderDiagLog();
+}
+function bindDiag() {
+  $("diagRun").addEventListener("click", runDiag);
+  $("diagClear").addEventListener("click", () => { diagLog.length = 0; renderDiagLog(); });
+  $("diagCopy").addEventListener("click", async () => {
+    if (!diagReport) return toast("Execute o diagnóstico primeiro");
+    try { await navigator.clipboard.writeText(diagReport); toast("📋 Relatório copiado"); } catch (e) { download("diagnostico.txt", diagReport, "text/plain"); }
   });
 }
 
